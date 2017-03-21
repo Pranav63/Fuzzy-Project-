@@ -1,0 +1,410 @@
+%FE correctanswer edited at 11:21:47 on 10/2/2017
+fuzzy_variable correctanswer ;
+   ranges from -1 to  5 ; 
+   fuzzy_set weak is /\ shaped and curved 2 at -1, 2, 3 ; 
+   fuzzy_set average is /\ shaped and curved 2 at 2, 4, 5 ; 
+   fuzzy_set outstanding is / shaped and curved 2 at 4, 5 ; 
+   defuzzify using 
+      largest membership
+       and mirror rule
+       and shrinking . 
+
+%FE questionattempt edited at 22:56:54 on 8/2/2017
+fuzzy_variable questionattempt ;
+   ranges from 0 to  5 ; 
+   fuzzy_set poor is /\ shaped and curved 2 at 0, 2, 3 ; 
+   fuzzy_set good is /\ shaped and curved 2 at 2.4, 4, 5 ; 
+   fuzzy_set excellent is / shaped and curved 2 at 4, 5 ; 
+   defuzzify using 
+      largest membership 
+       and mirror rule
+       and shrinking . 
+%FE pedagogychange edited at 9:28:29 on 9/2/2017
+fuzzy_variable pedagogychange ;
+   ranges from 0 to  10 ; 
+   fuzzy_set no is /\ shaped and curved 1 at 0, 4.9, 5 ; 
+   fuzzy_set yes is /\ shaped and curved 2 at 4.9, 9, 10 ; 
+   defuzzify using 
+      largest membership
+       and mirror rule
+       and shrinking . 
+%FE hinttaken edited at 11:29:29 on 10/2/2017
+fuzzy_variable hinttaken ;
+   ranges from -1 to  5 ; 
+   fuzzy_set few is /\ shaped and linear at -1, 1, 3 ; 
+   fuzzy_set average is /\ shaped and linear at 1, 4, 5 ; 
+   fuzzy_set large is / shaped and linear at 4, 5 ; 
+   defuzzify using 
+      largest membership
+       and mirror rule
+       and shrinking . 
+%FE qtt edited at 16:48:25 on 8/2/2017
+fuzzy_variable qtt ;
+   ranges from 0 to  10 ; 
+   fuzzy_set excellent is /\ shaped and linear at 0, 3, 4 ; 
+   fuzzy_set average is /\ shaped and linear at 3.5, 6, 7 ; 
+   fuzzy_set poor is / shaped and linear at 6.5, 10 ; 
+   defuzzify using 
+      largest membership
+       and mirror rule
+       and shrinking . 
+%FE intermediateresult edited at 22:45:53 on 8/2/2017
+fuzzy_variable intermediateresult ;
+   ranges from 0 to  10 ; 
+   fuzzy_set irno is /\ shaped and curved 1 at 0, 4, 5 ; 
+   fuzzy_set iryes is /\ shaped and curved 1.5 at 4.9, 10, 10 ; 
+   defuzzify using 
+      largest membership
+       and mirror rule
+       and shrinking . 
+
+%FE finalpedagogychange edited at 11:28:3 on 10/2/2017
+fuzzy_variable finalpedagogychange ;
+   ranges from 0 to  10 ; 
+   fuzzy_set finalno is /\ shaped and curved 2 at 0, 1, 5 ; 
+   fuzzy_set finalyes is /\ shaped and curved 0.25 at 5, 10, 10 ; 
+   defuzzify using 
+      largest membership
+       and mirror rule
+       and shrinking . 
+
+fuzzy_variable changepedagogy ;
+   ranges from 0 to  10 ; 
+   fuzzy_set changepedagogyno is /\ shaped and curved 1 at 0, 4.9, 5 ; 
+   fuzzy_set changepedagogyyes is /\ shaped and curved 2 at 4.9, 9, 10 ; 
+   defuzzify using 
+      largest membership
+       and mirror rule
+       and shrinking . 
+
+fuzzy_variable changeresultstyle ;
+   ranges from 0 to  10 ; 
+   fuzzy_set changeno is /\ shaped and curved 1 at 0, 4, 5 ; 
+   fuzzy_set changeyes is /\ shaped and curved 1.5 at 4.9, 10, 10 ; 
+   defuzzify using 
+      largest membership
+       and mirror rule
+       and shrinking .
+
+
+fuzzy_matrix pedagogychange_value 
+   correctanswer  *  questionattempt  ->  pedagogychange      ;
+    
+	weak          *  poor	   ->  no    ;
+
+	weak     	  *  good	      ->  yes	;
+	weak		  *  excellent	->  yes     ;
+    	
+      %average       *  poor	      ->  yes	;
+	average       *  good		->  no	;
+	average	  *  excellent	->  no	;
+     
+      %outstanding   *  poor	      ->  yes	;
+	%outstanding   *  good	      ->  yes	;
+	outstanding	  *  excellent	-> no       .
+fuzzy_matrix intermediateresult_value 
+   hinttaken  *  qtt  ->  intermediateresult      ;
+    
+	few         *  excellent	   ->  irno     ;
+
+	few     	  *  average	      ->  irno	;
+	few		  *  poor	->  irno      ;
+    	
+      average       *  excellent	      ->  irno	;
+	average       *  average		->  irno	;
+	average	  *  poor	->  iryes	;
+     
+      large   *  excellent	      ->  iryes	;
+	large   *  average	      ->  iryes	;
+	large	  *  poor	-> iryes       .
+
+fuzzy_matrix finalpedagogychange_value 
+   changepedagogy  *  changeresultstyle  ->  finalpedagogychange      ;
+    
+	changepedagogyno * changeno  -> finalno ;
+	changepedagogyyes * changeno ->  finalyes ;
+	changepedagogyno  * changeyes -> finalyes ;
+	changepedagogyyes  *  changeyes ->  finalyes
+	      .
+
+relation get_pedagogychange_value(Correctanswer,Questionattempt,Pedagogychange)
+  if reset all fuzzy values
+  and fuzzify the correctanswer from Correctanswer
+  and fuzzify the questionattempt from Questionattempt
+  and propagate pedagogychange_value fuzzy rules
+  and defuzzify the pedagogychange to Pedagogychange
+.
+
+relation get_intermediateresult_value(Hinttaken,Qtt,Intermediateresult)
+  if reset all fuzzy values
+  and fuzzify the hinttaken from Hinttaken
+  and fuzzify the qtt from Qtt
+  and propagate intermediateresult_value fuzzy rules
+  and defuzzify the intermediateresult to Intermediateresult
+.
+
+relation get_finalpedagogychange_value(Changepedagogy,Changeresultstyle,Finalpedagogychange)
+  if reset all fuzzy values
+  and fuzzify the changepedagogy from Changepedagogy
+  and fuzzify the changeresultstyle from Changeresultstyle
+  and propagate finalpedagogychange_value fuzzy rules
+  and defuzzify the finalpedagogychange to Finalpedagogychange
+.
+
+frame performanceparameter
+default correctanswer is 0
+and default questionattempt is 0
+and default pedagogychange is 0
+and default hinttaken is 0
+and default qtt is 0
+and default pedagogychange_level is emptyy
+and default intermediateresult_level is emptyy 
+and default intermediateresult is 0 
+and default finalpedagogychange is 0
+and default changeresultstyle is 0
+and default changepedagogy is 0.
+
+
+demon react_to_correctanswer_update
+  when the correctanswer of performanceparameter changes to SomeValue
+  then set_performanceparameter_pedagogychange
+ .
+
+demon react_to_questionattempt_update
+  when the questionattempt of performanceparameter changes to SomeOtherValue
+  then set_performanceparameter_pedagogychange
+.
+
+demon react_to_hinttaken_update
+  when the hinttaken of performanceparameter changes to SomehintValue
+  then set_performanceparameter_intermediateresult
+  .
+
+demon react_to_qtt_update
+  when the qtt of performanceparameter changes to SomeqttValue
+  then set_performanceparameter_intermediateresult
+.
+
+demon react_to_changepedagogy_update
+  when the changepedagogy of performanceparameter changes to SomeagainValue
+  then set_performanceparameter_finalpedagogychange
+ .
+
+demon react_to_changeresultstyle_update
+  when the changeresultstyle of performanceparameter changes to SomeresultValue
+  then set_performanceparameter_finalpedagogychange
+.
+
+action set_performanceparameter_changepedagogy(SomeagainValue)
+do the changepedagogy of performanceparameter becomes SomeagainValue
+.
+
+action set_performanceparameter_changeresultstyle(SomeresultValue)
+do the changeresultstyle of performanceparameter becomes SomeresultValue
+.
+
+action set_performanceparameter_finalpedagogychange
+  do  check the changepedagogy of performanceparameter is Changepedagogy
+  and check the changeresultstyle of performanceparameter is Changeresultstyle
+  and get_finalpedagogychange_value(Changepedagogy,Changeresultstyle,Finalpedagogychange)
+  and the finalpedagogychange of performanceparameter becomes Finalpedagogychange
+.
+
+
+action set_performanceparameter_correctanswer(SomeValue)
+do the correctanswer of performanceparameter becomes SomeValue
+.
+
+action set_performanceparameter_questionattempt(SomeOtherValue)
+do the questionattempt of performanceparameter becomes SomeOtherValue 
+.
+
+action set_performanceparameter_pedagogychange
+  do  check the correctanswer of performanceparameter is Correctanswer
+  and check the questionattempt of performanceparameter is Questionattempt
+  and get_pedagogychange_value(Correctanswer,Questionattempt,Pedagogychange)
+  and the  pedagogychange of performanceparameter becomes Pedagogychange
+.
+action set_performanceparameter_hinttaken(SomehintValue)
+do the hinttaken of performanceparameter becomes SomehintValue
+.
+
+action set_performanceparameter_qtt(SomeqttValue)
+do the qtt of performanceparameter becomes SomeqttValue 
+.
+
+action set_performanceparameter_intermediateresult
+  do  check the hinttaken of performanceparameter is Hinttaken
+  and check the qtt of performanceparameter is Qtt
+  and get_intermediateresult_value(Hinttaken,Qtt, Intermediateresult)
+  and the  intermediateresult of performanceparameter becomes Intermediateresult
+.
+
+action display_performanceparameter_result
+do write('Results Are As Follows : ')
+and nl
+and write('Number of Hint taken is : ')
+and write(the hinttaken of performanceparameter) 
+and nl 
+and write('The result is : ') 
+and write(the intermediateresult of performanceparameter )
+and nl
+and write('The quiz time taken is:  ')
+and write(the qtt of performanceparameter)
+and nl
+and write('Number of correct answer is : ')
+and write(the correctanswer of performanceparameter) 
+and nl 
+and write('The Pedagogy change result is : ') 
+and write(the pedagogychange of performanceparameter )
+and nl
+and write('The Number of Question attempt is:  ')
+and write(the questionattempt of performanceparameter)
+and nl
+.  
+
+%first pedagogy change value
+
+rule rpedagogychangea
+if the pedagogychange of the performanceparameter is below 5.0
+then the pedagogychange_level of the performanceparameter becomes no.
+
+rule rpedagogychangeb
+if the pedagogychange of the performanceparameter is greater than or equal to  5.1  and the pedagogychange of the performanceparameter is less than or equal to 10
+then the pedagogychange_level of the performanceparameter becomes yes.
+
+
+%second Intermediatepedagogy change value
+rule rintermediatechangea
+if the intermediateresult of the performanceparameter is below 5.0
+then the intermediateresult_level of the performanceparameter becomes irno.
+
+rule rintermediatechangeb
+if the intermediateresult of the performanceparameter is greater than or equal to  5.1  and the pedagogychange of the performanceparameter is less than or equal to 10
+then the intermediateresult_level of the performanceparameter becomes iryes.
+
+
+ 
+%final decision for pedagogychange
+rule rfinaldecisiona
+if the pedagogychange_level of the performanceparameter is no and the intermediateresult_level of the performanceparameter is irno
+then 
+%change_Pedagogy_value := pedagogychange
+%and intermediate_change_style := intermediateresult
+write('The SeisTutor Expert Detects that, You are satisfied with current pedagogy Style. So Expert Decided to Continue.') 
+%and nl
+%and set_performanceparameter_changepedagogy(change_Pedagogy_value)
+%and write('the value of changepedagogy of performanceparameter  :') 
+%and write(the changepedagogy of performanceparameter )
+%and set_performanceparameter_changeresultstyle(intermediate_change_style)
+%and write('the value of changeresultstyle of performanceparameter : ')
+%and write(the changeresultstyle of performanceparameter )
+and nl.
+
+rule rfinaldecisionb
+if the pedagogychange_level of the performanceparameter is no and the intermediateresult_level of the performanceparameter is iryes
+then 
+%change_Pedagogy_value := pedagogychange
+%and intermediate_change_style := intermediateresult
+write('The SeisTutor Expert Detects that, You are not satisfied with current pedagogy Style. So Expert Decided to Continue.') and nl 
+%and nl
+%and set_performanceparameter_changepedagogy(change_Pedagogy_value)
+%and write('the value of changepedagogy of performanceparameter  :') 
+%and write(the changepedagogy of performanceparameter )
+%and set_performanceparameter_changeresultstyle(intermediate_change_style)
+%and write('the value of changeresultstyle of performanceparameter : ')
+%and write(the changeresultstyle of performanceparameter )
+and nl.
+
+
+rule rfinaldecisionc
+if the pedagogychange_level of the performanceparameter is yes and the intermediateresult_level of the performanceparameter is iryes
+then 
+%change_Pedagogy_value := pedagogychange
+%and intermediate_change_style := intermediateresult
+write('The SeisTutor Expert Detects that, You are not the satisfied with current pedagogy Style. So Expert Decided to Change It. ') 
+%and nl
+%and set_performanceparameter_changepedagogy(change_Pedagogy_value)
+%and write('the value of changepedagogy of performanceparameter  :') 
+%and write(the changepedagogy of performanceparameter )
+%and set_performanceparameter_changeresultstyle(intermediate_change_style)
+%and write('the value of changeresultstyle of performanceparameter : ')
+%and write(the changeresultstyle of performanceparameter )
+and nl.
+
+
+rule rfinaldecisiond
+if the pedagogychange_level of the performanceparameter is yes and the intermediateresult_level of the performanceparameter is irno
+then 
+%change_Pedagogy_value := pedagogychange
+%and intermediate_change_style := intermediateresult
+write('The SeisTutor Expert Detects that, You are not the satisfied with current pedagogy Style. So Expert Decided to Change It. ') and nl 
+%and nl
+%and set_performanceparameter_changepedagogy(change_Pedagogy_value)
+%and write('the value of changepedagogy of performanceparameter  :') 
+%and write(the changepedagogy of performanceparameter )
+%and set_performanceparameter_changeresultstyle(intermediate_change_style)
+%and write('the value of changeresultstyle of performanceparameter : ')
+%and write(the changeresultstyle of performanceparameter )
+and nl.
+
+
+%group first pedagogy change value
+group pedagogychangerule
+rpedagogychangea, rpedagogychangeb .
+
+%group final decision for pedagogychange
+group finaldecisionrule
+rfinaldecisiona, rfinaldecisionb,rfinaldecisionc,rfinaldecisiond .
+
+%group second Intermediatepedagogy change value
+group intermediatechangerule
+rintermediatechangea, rintermediatechangeb.
+%rulesets
+
+%ruleset for crisp sets definitions
+
+ruleset pedagogychangeruleset
+contains pedagogychangerule; 
+update ruleset by removing each selected rule.
+
+ruleset intermediatechangeruleset
+contains intermediatechangerule;
+update ruleset by removing each selected rule.
+
+ruleset finaldecisionruleset
+contains finaldecisionrule;
+update ruleset by removing each selected rule.
+ 
+
+action test_perfomance_values
+   do change_Pedagogy_value := 0
+   and intermediate_change_style :=0
+   and  set_performanceparameter_questionattempt(5)
+   and set_performanceparameter_correctanswer(5)
+   and set_performanceparameter_hinttaken(4)
+   and set_performanceparameter_qtt(5)
+   and display_performanceparameter_result
+   and updated_value
+   and set_performanceparameter_changepedagogy(change_Pedagogy_value)
+   and set_performanceparameter_changeresultstyle(intermediate_change_style)
+   and write('The final result is :')
+   and write(the finalpedagogychange of performanceparameter )
+and nl 
+and invoke ruleset pedagogychangeruleset 
+and invoke ruleset intermediatechangeruleset
+and invoke ruleset finaldecisionruleset
+and nl
+%and write(the pedagogychange_level of performanceparameter)
+%and nl
+%and write(the intermediateresult_level of performanceparameter)
+%and nl
+.
+action updated_value;
+do change_Pedagogy_value := the pedagogychange of performanceparameter
+and intermediate_change_style := the intermediateresult of performanceparameter .
+
+	
+
+
+
